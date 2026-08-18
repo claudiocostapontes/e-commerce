@@ -1,0 +1,35 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Em produção, altere para "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  fullName      String
+  email         String
+  document      String
+  zipCode       String
+  addressNumber String
+  paymentMethod String
+  totalAmount   Float       // Total calculado no backend
+  status        String      @default("PENDING") // PENDING, PAID, CANCELED
+  createdAt     DateTime    @default(now())
+  
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  price     Float   // Preço no momento da compra (imutabilidade histórica)
+  quantity  Int
+
+  order     Order   @relation(fields: [orderId], references: [id])
+}
