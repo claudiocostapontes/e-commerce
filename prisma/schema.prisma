@@ -5,31 +5,55 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Em produção, altere para "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite" // Mude para "postgresql" quando for para produção
 }
 
-model Order {
-  id            String      @id @default(uuid())
-  fullName      String
-  email         String
-  document      String
-  zipCode       String
-  addressNumber String
-  paymentMethod String
-  totalAmount   Float       // Total calculado no backend
-  status        String      @default("PENDING") // PENDING, PAID, CANCELED
-  createdAt     DateTime    @default(now())
+// --- Modelos Exigidos pelo NextAuth ---
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  
+  access_token       String?  
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // Necessário apenas para autenticação via Credentials
+  role          String    @default("USER") // Útil para o Backoffice no futuro
   
-  items         OrderItem[]
+  accounts      Account[]
+  sessions      Session[]
 }
 
-model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  productId String
-  price     Float   // Preço no momento da compra (imutabilidade histórica)
-  quantity  Int
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-  order     Order   @relation(fields: [orderId], references: [id])
+  @@unique([identifier, token])
 }

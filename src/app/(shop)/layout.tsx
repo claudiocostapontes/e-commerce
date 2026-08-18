@@ -1,18 +1,14 @@
 // src/app/(shop)/layout.tsx
-import { BottomNav } from '@/components/common/BottomNav';
-
 export default function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col pb-16 md:pb-0">
-      {/* Header Desktop entraria aqui */}
-      <main className="flex-1">
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      <main className="flex-1 pb-16 sm:pb-0">
         {children}
       </main>
-      <BottomNav />
     </div>
   );
 }
