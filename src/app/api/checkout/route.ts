@@ -1,7 +1,7 @@
 // src/app/api/checkout/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { CheckoutSchema } from '@/features/checkout/schemas/checkout.schema';
 
 // 1. Estendemos o schema do formulário para incluir os itens do carrinho na requisição
@@ -23,7 +23,7 @@ const getProductPriceFromDB = async (productId: string) => {
   return db[productId as keyof typeof db] || null;
 };
 
-export async function POST(request: Request) {
+async function POST(request: Request) {
   try {
     const body = await request.json();
 
@@ -89,3 +89,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Erro interno ao processar pedido' }, { status: 500 });
   }
 }
+
+export default POST
